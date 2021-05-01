@@ -45,7 +45,6 @@ public class ClientVelocitats {
     public void runClient() throws IOException {
         byte[] receivedData = new byte[4];
 
-        System.out.println("dentro del run");
         DatagramPacket packet;
         DatagramSocket socket = new DatagramSocket();
 
@@ -53,7 +52,6 @@ public class ClientVelocitats {
 
         while (true) {
             packet = new DatagramPacket(receivedData, 4);
-            System.out.println("dentro del bucle");
             multicastSocket.receive(packet);
             resultado = getDataToRequest(packet.getData(), packet.getLength());
         }
@@ -64,9 +62,8 @@ public class ClientVelocitats {
         int resultado = 0;
         total = total + n;
         counter++;
-        System.out.println("dentro del metodo");
+
         if (counter % 5 == 0) {
-            System.out.println("dentro del if");
             resultado = total / 5;
             System.out.println(resultado);
             total = 0;
