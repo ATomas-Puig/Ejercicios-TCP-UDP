@@ -1,40 +1,52 @@
 package ejercicio2;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.stream.Collectors;
 
 public class ThreadSrvLlista implements Runnable {
 
     Socket clientSocket = null;
-    BufferedReader in = null;
-    PrintStream out = null;
     Llista msgIn, msgOut;
+    InputStream in;
+    ObjectInputStream oiStream;
+    OutputStream out;
+    ObjectOutputStream ooStream;
     boolean acabado;
 
-    public ThreadSrvLlista(Socket clientSocket, Llista llista) throws IOException {
+    public ThreadSrvLlista(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
-        this.msgIn = llista;
         acabado = false;
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        out = new PrintStream(clientSocket.getOutputStream());
+        in = clientSocket.getInputStream();
+        oiStream = new ObjectInputStream(in);
+        out = clientSocket.getOutputStream();
+        ooStream = new ObjectOutputStream(out);
     }
 
     @Override
     public void run() {
         while (!acabado) {
-            msgOut = generarRespuesta(msgIn);
+            try {
+                msgIn = (Llista) oiStream.readObject();
+                msgOut = generarRespuesta(msgIn);
+                ooStream.writeObject(msgOut);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
 
-            out.println(msgOut);
-            out.flush();
+            try {
+                ooStream.writeObject(msgOut);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
     private Llista generarRespuesta(Llista msgIn) {
+        System.out.println(msgIn.getNom());
         Llista ret = null;
 
         if (msgIn != null && msgIn.getNumberList().size() > 0) {

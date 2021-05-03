@@ -12,6 +12,17 @@ public class ClientLlista extends Thread {
     String hostname;
     int port;
     boolean continueConnected;
+    Llista ret = null;
+    String nombre;
+    List<Integer> numberList;
+    int numero = 0;
+    Scanner sc = new Scanner(System.in);
+    Socket socket;
+    InputStream in;
+    ObjectInputStream oiStream;
+
+    OutputStream out;
+    ObjectOutputStream ooStream;
 
     public ClientLlista(String hostname, int port) {
         this.hostname = hostname;
@@ -20,64 +31,47 @@ public class ClientLlista extends Thread {
     }
 
     public void run() {
-        System.out.println("Aquí estamos");
-        Llista serverData;
-        Llista request;
+        numberList = new ArrayList<>();
+        System.out.println("Introduce tu nombre:");
+        nombre = sc.nextLine();
+        System.out.println(nombre);
 
-        Socket socket;
-        InputStream inStream;
-        ObjectInputStream oiStream;
-
-        OutputStream outStream;
-        ObjectOutputStream ooStream;
+        do {
+            System.out.println("Introduce un número (introduce 0 para terminar):");
+            System.out.println(nombre);
+            numero = sc.nextInt();
+            numberList.add(numero);
+            System.out.println(nombre);
+        } while (numero > 0);
+        ret = new Llista(nombre, numberList);
 
         try {
             socket = new Socket(InetAddress.getByName(hostname), port);
-            inStream = socket.getInputStream();
-            oiStream = new ObjectInputStream(inStream);
-            serverData = (Llista) oiStream.readObject();
-            System.out.println("Justo después del socket");
+            out = socket.getOutputStream();
+            ooStream = new ObjectOutputStream(out);
+            System.out.println(ret.getNom());
+            ooStream.writeObject(ret);
 
-            outStream = socket.getOutputStream();
-            ooStream = new ObjectOutputStream(outStream);
-
-            System.out.println("Antes del while");
-            while (continueConnected) {
-                System.out.println("Dentro del while");
-                serverData = (Llista) oiStream.readObject();
-                request = getRequest(serverData);
-
-                ooStream.writeObject(request);
-            }
+            in = socket.getInputStream();
+            oiStream = new ObjectInputStream(in);
+            ret = (Llista) oiStream.readObject();
+            getRequest(ret);
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+
     }
 
-    private Llista getRequest(Llista serverData) {
-        Llista ret = null;
-        String nombre = "";
-        List<Integer> numberList;
-        int numero = 0;
-        if (serverData == null) {
-            numberList = new ArrayList<>();
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Introduce tu nombre");
-            nombre = sc.nextLine();
-            do {
-                System.out.println("Introduce un número (introduce 0 para terminar):");
-                numero = sc.nextInt();
-                numberList.add(numero);
-            } while (numero > 0);
-            ret = new Llista(nombre, numberList);
-        } else {
-            System.out.print("Lista ordenada de números enviados por " + serverData.getNom() + ": ");
-            serverData.getNumberList().forEach(integer -> System.out.print(integer));
-            System.out.println();
-        }
-        return ret;
+    private void getRequest(Llista serverData) {
+
+        System.out.print("Lista ordenada de números enviados por " + serverData.getNom() + ": ");
+        serverData.getNumberList().forEach(integer -> System.out.print(integer+", "));
+        System.out.println();
+
     }
+
 
     public static void main(String[] args) {
         ClientLlista clientLlista = new ClientLlista("localhost", 5557);

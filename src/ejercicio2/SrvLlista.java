@@ -12,7 +12,6 @@ public class SrvLlista {
 
     public SrvLlista(int port){
         this.port = port;
-        llista = new Llista("", new ArrayList<>());
     }
 
     public void listen(){
@@ -23,8 +22,9 @@ public class SrvLlista {
             serverSocket= new ServerSocket(port);
             while (true){
                 clientSocket = serverSocket.accept();
-                ThreadSrvLlista threadSrvLlista = new ThreadSrvLlista(clientSocket, llista);
+                ThreadSrvLlista threadSrvLlista = new ThreadSrvLlista(clientSocket);
                 Thread client = new Thread(threadSrvLlista);
+                client.start();
             }
         } catch (IOException e) {
             e.printStackTrace();
