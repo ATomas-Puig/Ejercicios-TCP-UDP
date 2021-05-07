@@ -34,14 +34,12 @@ public class ClientLlista extends Thread {
         numberList = new ArrayList<>();
         System.out.println("Introduce tu nombre:");
         nombre = sc.nextLine();
-        System.out.println(nombre);
+        System.out.print("Hola " + nombre + ". ");
 
         do {
             System.out.println("Introduce un número (introduce 0 para terminar):");
-            System.out.println(nombre);
             numero = sc.nextInt();
-            numberList.add(numero);
-            System.out.println(nombre);
+            if (numero > 0) numberList.add(numero);
         } while (numero > 0);
         ret = new Llista(nombre, numberList);
 
@@ -49,7 +47,6 @@ public class ClientLlista extends Thread {
             socket = new Socket(InetAddress.getByName(hostname), port);
             out = socket.getOutputStream();
             ooStream = new ObjectOutputStream(out);
-            System.out.println(ret.getNom());
             ooStream.writeObject(ret);
 
             in = socket.getInputStream();
@@ -66,8 +63,8 @@ public class ClientLlista extends Thread {
 
     private void getRequest(Llista serverData) {
 
-        System.out.print("Lista ordenada de números enviados por " + serverData.getNom() + ": ");
-        serverData.getNumberList().forEach(integer -> System.out.print(integer+", "));
+        System.out.print(serverData.getNom() + ", esta es la lista ordenada con los números que has enviado: ");
+        serverData.getNumberList().forEach(integer -> System.out.print(integer + ", "));
         System.out.println();
 
     }
