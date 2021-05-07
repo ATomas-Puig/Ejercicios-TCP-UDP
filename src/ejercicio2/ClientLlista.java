@@ -66,6 +66,7 @@ public class ClientLlista extends Thread {
         System.out.print(serverData.getNom() + ", esta es la lista ordenada con los números que has enviado: ");
         serverData.getNumberList().forEach(integer -> System.out.print(integer + ", "));
         System.out.println();
+        System.out.println("¡Hasta luego!");
 
     }
 
